@@ -8,6 +8,35 @@ script designed to normalise and fit z-scan data using stochiastic method
 includes two models for fitting v1 and v2
 
 license = MIT
+
+You will need python 2.7 and the following packages installed
+
+Pandas
+matplotlib
+numpy
+scipy
+
+The data must be normalised in csv form with columns:
+
+z(mm),open,closed
+
+and name of file must be
+
+x_thickness_energynJ_x...
+
+
+Use the nomralising program on www.github/KasparSnashall/Z-scan-models
+to normalise data from a z-scan.
+
+
+Data is fitted using scipy's curve fit algorithm that is based on least squares.
+To use this program change file directory and save directory to desired paths,
+from terminal $ python Open-scan-fitting.py
+If the data is in the correct form it should run, then present the user with a fitted plot and gui to change paramters is nessesary.
+Once you are happy with the plot exit it and hit enter in the terminal, the program then continues to the next data point.
+
+
+The program will have to be altered for anyones use however this is just meant to be a rough blue print for data fitting with a GUI.
 """
 
 import pandas as pd
@@ -21,6 +50,7 @@ from matplotlib.widgets import Slider, Button, RadioButtons
 from vertical import VertSlider
 
 def OpenScanv3(z,z0,beta):
+	"""The plot used in curve fitting"""
 	X = (z/z0)**2
 	m=0 
 	mysum = 0 # my sum
@@ -32,15 +62,16 @@ def OpenScanv3(z,z0,beta):
 
      
 def BeamWaist(Z0):
-	#caluculate the beam waist
+	"""caluculate the beam waist"""
 	wavelength = 1030*10**(-9) # m
 	return np.sqrt(abs(Z0)*wavelength/np.pi)
 
 def BeamWaistErr(w0,z0,deltaz0):
+
     return w0*np.sqrt(deltaz0/z0)
 
 def Intensity(W0,energy,pulsetime):
-	#calculate the intensity at focus
+	"""calculate the intensity at focus"""
 	power = energy/pulsetime
 	i = power/(np.pi*W0**2)
 	return i
@@ -49,20 +80,22 @@ def IntensityErr(i0,waistErr):
     return i0*waistErr
 
 def L_eff(L,aplha):
-	# calculate the effective length
+	"""calculate the effective length"""
 	return (1-np.exp(-aplha*L))/aplha
 
 def Beta(i0,l,q0):
-	# calculate the non linear absorbtion coefficent
+	"""calculate the non linear absorbtion coefficent"""
 	return  q0/(i0*l)
  
 def BetaErr(b,q0,q0Err,i0Err,i0):
     return b*np.sqrt((q0Err/q0)**2+(i0Err/i0)**2)
  
 def ReadAllFiles(folder):
+    """reads all the files in a given directory"""
     return [ f for f in listdir(folder) if isfile(join(folder,f)) and '.csv' in f and 'correct' in f]
     
 def GetParams(f):
+	"""Get the energy length and alpha from the file name"""
     myl = f.split('_')[1]
     print myl
     if myl == '05nm':
@@ -101,33 +134,37 @@ def GetParams(f):
 
 
     
-def Main(i,fitted_data):
-    saveDirectory = '/home/kaspar/Desktop/20151118-correct/'
-    fileDirectory = '/home/kaspar/Desktop/20151118-correct/'
+def Main(i,fitted_data,saveDirectory,fileDirectory):
    
-    mybuttonslist = []
-    f = ReadAllFiles(fileDirectory)[i]
+    mybuttonslist = [] # blank list needed for gui to work
+    f = ReadAllFiles(fileDirectory)[i] # ith file name
     data = pd.read_csv(fileDirectory+f) # grab the data
     z = data.iloc[0:,0]/10**3 # z in meters
-    print f
+
     ydata = data.iloc[0:,1] #the transmission
-    global energy,L,alpha,leff,pulsetime
+   
     
-    pulsetime = 340*10**(-15)     
+    pulsetime = 340*10**(-15) # the pulse time
+
     energy,L,alpha = GetParams(f)
     leff = L_eff(L,alpha)
-    print leff
     
-    guess= [0.009,0.5]
-    params, params_covariance = optimize.curve_fit(OpenScanv3,z, ydata, guess)
+
+	# the main [art pf the program
+
+    guess= [0.009,0.5] # initial guess
+    params, params_covariance = optimize.curve_fit(OpenScanv3,z, ydata, guess) # the fitting
     #print params
     #print params_covariance
-    sigma1 = params_covariance[0]
-    sigma2 = params_covariance[1]
-    z0 = params[0]
-    b = params[1] # the NL absorbtion coefficent
+    sigma1 = params_covariance[0] # 1st param cov
+    sigma2 = params_covariance[1] # 2nd param cov
+    z0 = params[0] # 1st param
+    b = params[1] # the NL absorbtion coefficent -> 2nd param
     if z0 < 0:
-        z0 = -z0
+        z0 = -z0 # make usre it hasnt made z0 negative
+
+
+
     w0 = BeamWaist(z0) # the beam width
     i0 = Intensity(w0,energy,pulsetime) # the intensity at focus        
     
@@ -137,6 +174,10 @@ def Main(i,fitted_data):
     w0Err = BeamWaistErr(w0,z0,perr[0])
     i0Err = IntensityErr(i0,w0Err)
     bErr = perr[1]
+
+
+
+
     print params
     print perr
     print w0,w0Err
@@ -254,9 +295,11 @@ def Main(i,fitted_data):
 if __name__ == '__main__':
     fitted_data = pd.DataFrame(columns = ('Name','L','E(nJ)','Z0(mm)','Zerr','b','berr','Adj Z0','Adj b','delta x','delta y','w0(mm)','werr','I0(Gw/cm^2)','Ierr','alpha'),index=None)
     fileDirectory = '/home/kaspar/Desktop/20151118-correct/'
-    f = ReadAllFiles(fileDirectory)    
+	saveDirectory = '/home/kaspar/Desktop/20151118-correct/'
+    f = ReadAllFiles(fileDirectory)
+	global energy,L,alpha,leff,pulsetime # define some globals
     for i in range(len(f)):
-        button = Main(i,fitted_data)
+        button = Main(i,fitted_data,fileDirectory,saveDirectory)
     fitted_data.to_csv('/home/kaspar/Desktop/2011118.csv',index=False)
         
        
