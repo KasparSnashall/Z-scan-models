@@ -3,6 +3,6 @@ Python and mathematica programs desingned to fit data z-scan experiemtnal data. 
 
 <table >
   <tr>
-    <td align="center"><img src="samplefit.png"/></td>
+    <td align="center"><img src="samplefit.png" width=500px></td>
   </tr>
 </table>
