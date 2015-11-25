@@ -5,7 +5,7 @@ Created on Tue Oct 20 08:42:33 2015
 @author: Kaspar Martin Snashall
 
 script designed to normalise and fit z-scan data using stochiastic method
-includes two models for fitting v1 and v2
+has final versio  of algorithm v3
 
 license = MIT
 
@@ -22,7 +22,7 @@ z(mm),open,closed
 
 and name of file must be
 
-x_thickness_energynJ_x...
+x_thickness_energynJ_moreinfo.csv
 
 
 Use the nomralising program on www.github/KasparSnashall/Z-scan-models
