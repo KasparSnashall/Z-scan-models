@@ -1,6 +1,7 @@
 # Z-scan-models
 Python and mathematica programs desingned to fit z-scan experimental data the inttended user is anyone who has z-scan data and can alter the code for their purposes. The fitting methods include the ability to calculate the error of each paramter, they also provide a general method of plot fittingnusing Scipys curve fitting module. 
-![](samplefit.png)
+<div style="float: right; margin-left: 30px;"><img title="Open Z scan example fit"style="float: right;margin-left: 30px;" src="samplefit.png" align=right height = 200 /></div>
+
 
 Usage
 ------
