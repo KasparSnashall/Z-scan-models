@@ -146,9 +146,9 @@ def GetParams(f):
 
 
     
-def Main(i,fitted_data,saveDirectory,fileDirectory):
-    """the mian function of the program"""
-    f = ReadAllFiles(fileDirectory)[i] # ith file name
+def Main(file,fitted_data,saveDirectory,fileDirectory):
+    """The main function of the program"""
+    f =  file# ith file name from list of files in directory
     data = pd.read_csv(fileDirectory+f) # grab the data
     z = data.iloc[0:,0]/10**3 # z in meters
     ydata = data.iloc[0:,1] #the transmission    
@@ -338,7 +338,7 @@ if __name__ == '__main__':
     f = ReadAllFiles(fileDirectory) # read all the fils in 
     for i in range(len(f)):
         # iterate over the files and fit
-        button = Main(i,fitted_data,fileDirectory,saveDirectory)
+        button = Main(f[i],fitted_data,fileDirectory,saveDirectory)
     #once the fitting is complete create a csv        
     print fitted_data
     fitted_data.to_csv('/home/kaspar/Desktop/test.csv',index=False)
