@@ -146,9 +146,9 @@ def GetParams(f):
 
 
     
-def Main(file,fitted_data,saveDirectory,fileDirectory):
+def Main(myfile,fitted_data,saveDirectory,fileDirectory):
     """The main function of the program"""
-    f =  file# ith file name from list of files in directory
+    f =  myfile# ith file name from list of files in directory
     data = pd.read_csv(fileDirectory+f) # grab the data
     z = data.iloc[0:,0]/10**3 # z in meters
     ydata = data.iloc[0:,1] #the transmission    
