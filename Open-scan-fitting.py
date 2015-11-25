@@ -128,13 +128,15 @@ def GetParams(f):
     # clean up the energy so its just a number
     energy1 = f.split('_')[2] 
     energy2 = re.sub('nJ','',energy1)
-    #test to see if energy is a number
+    #test to see if energy is a number 
+    #this is because a mistake made in some file names where 2nd position was not the energy
     try:
         energy = float(energy2)*10**-9
     except:
         energy1 = f.split('_')[3]
         energy2 = re.sub('nJ','',energy1)
         energy = float(energy2)*10**-9
+    # test to see if all the variables are numbers
     try:
         print "energy =",float(energy)
         print "length =",float(L)
